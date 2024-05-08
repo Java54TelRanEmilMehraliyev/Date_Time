@@ -8,7 +8,7 @@ import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
 import java.util.Locale;
 
-record MonthYear(int month, int year) {
+record MonthYear(int month, int year, int weekDayStart) {
 	
 }
 public class PrintCalendar {
@@ -18,7 +18,8 @@ public class PrintCalendar {
 	private static DayOfWeek[] weekDays = DayOfWeek.values();
 	public static void main(String[] args)  {
 		try {
-			MonthYear monthYear = getMonthYear(args);
+			int weekStartDay = args.length < 3 ? 1 : DayOfWeek.valueOf(args[2].toUpperCase()).getValue();
+			MonthYear monthYear = getMonthYear(args, weekStartDay);
 			printCalendar(monthYear);
 		} catch (RuntimeException e) {
 			e.printStackTrace();
@@ -27,10 +28,10 @@ public class PrintCalendar {
 		}
 	}
 
-	private static  MonthYear getMonthYear(String[] args) throws Exception{
+	private static  MonthYear getMonthYear(String[] args, int weekStartDay) throws Exception{
 		int monthNumber = getMonth(args);
 		int year = getYear(args);
-		return new MonthYear(monthNumber, year);
+		return new MonthYear(monthNumber, year, weekStartDay);
 	}
 
 	private static int getYear(String[] args) throws Exception {
@@ -131,7 +132,7 @@ public class PrintCalendar {
 
 	private static void printTitle(MonthYear monthYear) {
 		String monthName = Month.of(monthYear.month())
-				.getDisplayName(TextStyle.FULL, Locale.getDefault());
+				.getDisplayName(TextStyle.FULL, Locale.forLanguageTag("en"));
 		System.out.printf("%s%s %d\n"," ".repeat(TITLE_OFFSET), monthName, monthYear.year());
 		
 		
