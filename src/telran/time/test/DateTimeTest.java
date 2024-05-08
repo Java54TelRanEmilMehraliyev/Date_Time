@@ -25,14 +25,14 @@ class DateTimeTest {
 	@Test
 	void nextFriday13Test() {
 		NextFriday13 nextFriday13 = new NextFriday13();
-		LocalDate date = LocalDate.of(2024, 5, 3);
-		LocalDate result = (LocalDate) nextFriday13.adjustInto(date);
+		Temporal date = LocalDate.of(2024, 5, 8);
+		Temporal result = nextFriday13.adjustInto(date);
 	    assertEquals(LocalDate.of(2024, 9, 13),result);
 	}
 	@Test
 	void friday13RangeTest() {
-		LocalDate from = LocalDate.of(2024, 05, 04);
-		LocalDate to = LocalDate.of(2024, 12, 31);
+		Temporal from = LocalDate.of(2024, 05, 04);
+		Temporal to = LocalDate.of(2024, 12, 31);
 		Friday13Range range = new Friday13Range(from,to);
 		Iterator<Temporal> iterator = range.iterator();
 		assertTrue(iterator.hasNext());
