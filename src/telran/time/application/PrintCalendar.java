@@ -6,9 +6,10 @@ import java.time.Month;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
+import java.util.Arrays;
 import java.util.Locale;
 
-record MonthYear(int month, int year, int weekDayStart) {
+record MonthYear(int month, int year, DayOfWeek weekDayStart) {
 	
 }
 public class PrintCalendar {
@@ -18,17 +19,20 @@ public class PrintCalendar {
 	private static DayOfWeek[] weekDays = DayOfWeek.values();
 	public static void main(String[] args)  {
 		try {
-			int weekStartDay = args.length < 3 ? 1 : DayOfWeek.valueOf(args[2].toUpperCase()).getValue();
+			DayOfWeek weekStartDay = args.length < 3 ? 
+		DayOfWeek.MONDAY : DayOfWeek.valueOf(args[2].toUpperCase());
 			MonthYear monthYear = getMonthYear(args, weekStartDay);
 			printCalendar(monthYear);
-		} catch (RuntimeException e) {
-			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			System.out.println("Ошибка: введенное значение должно быть числом.");
+		} catch (IllegalArgumentException e) {
+			System.out.println("Ошибка: неверное значение дня недели. Должно быть одно из следующих: " + Arrays.toString(DayOfWeek.values()));
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("Произошла неожиданная ошибка: " + e.getMessage());
 		}
 	}
 
-	private static  MonthYear getMonthYear(String[] args, int weekStartDay) throws Exception{
+	private static  MonthYear getMonthYear(String[] args, DayOfWeek weekStartDay) throws Exception{
 		int monthNumber = getMonth(args);
 		int year = getYear(args);
 		return new MonthYear(monthNumber, year, weekStartDay);
@@ -80,14 +84,23 @@ public class PrintCalendar {
 	}
 
 	private static void printCalendar(MonthYear monthYear) {
+		DayOfWeek[]weekDays = getWeekDayStartingFrom(monthYear.weekDayStart());
 		printTitle(monthYear);
-		printWeekDays();
-		printDays(monthYear);
-		
-		
+		printWeekDays(weekDays);
+		printDays(monthYear,weekDays);		
 	}
 
-	private static void printDays(MonthYear monthYear) {
+	private static DayOfWeek[] getWeekDayStartingFrom(DayOfWeek weekDayStart) {
+      DayOfWeek[] weekDays = DayOfWeek.values();
+      DayOfWeek[] reorderedWeekDays = new DayOfWeek[7];
+      int startDayIndex = weekDayStart.getValue() -1;
+      for(int i = 0; i < 7; i++) {
+    	  reorderedWeekDays[i] = weekDays[(startDayIndex + i) % 7];
+      }
+     return reorderedWeekDays;
+	}
+
+	private static void printDays(MonthYear monthYear,DayOfWeek[] weekDays) {
 		int nDays = getDaysInMonth(monthYear);
 		int currentWeekDay = getFirstDayOfMonth(monthYear);
 		int firstOffset = getFirstOffset(currentWeekDay);
@@ -119,7 +132,7 @@ public class PrintCalendar {
 		return ym.lengthOfMonth();
 	}
 
-	private static void printWeekDays() {
+	private static void printWeekDays(DayOfWeek[] weekDays) {
 		System.out.printf("%s", " ".repeat(1));
 		for(DayOfWeek weekday: weekDays) {
 			System.out.printf("%" + COLUMN_WIDTH +"s",weekday.getDisplayName(TextStyle.SHORT,
